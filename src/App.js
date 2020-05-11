@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.scss';
 import generatePassword from './utils/generatePassword';
 
@@ -12,7 +12,11 @@ const PasswordGenerator = () => {
   const [numbers, setNumbers] = useState(true);
   const [symbols, setSymbols] = useState(true);
 
-  const generateAndSetPassword = () => {
+  useEffect(() => {
+    generateAndSetPassword(length);
+  }, []);
+
+  const generateAndSetPassword = (length) => {
     const password = generatePassword(length, {
       uppercase,
       lowercase,
@@ -23,11 +27,12 @@ const PasswordGenerator = () => {
   };
   const onSubmit = (e) => {
     e.preventDefault();
-    generateAndSetPassword();
+    generateAndSetPassword(length);
   };
   const handleLengthChange = (e) => {
-    setLength(e.target.value);
-    generateAndSetPassword();
+    const length = e.target.value;
+    setLength(length);
+    generateAndSetPassword(length);
   };
 
   const getStrength = () => {
