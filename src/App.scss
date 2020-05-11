@@ -1,0 +1,48 @@
+.App {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  font-family: monospace;
+}
+
+#password-generator-form {
+  display: flex;
+  flex-direction: column;
+  padding: 1em 2em 2em 2em;
+  border: 1px solid #ccc;
+}
+#password {
+  height: 2em;
+  font-size: 16px;
+  padding: 0 5px;
+  font-weight: bold;
+
+  &.weak {
+    border: 2px solid red;
+  }
+  &.medium {
+    border: 2px solid orange;
+  }
+  &.strong {
+    border: 3px solid green;
+  }
+}
+#strength {
+  font-size: 10px;
+}
+#generate-btn {
+  height: 2em;
+  border: 1px solid #ccc;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: 0.3s;
+
+  &:hover {
+    cursor: pointer;
+    opacity: 0.6;
+    background-color: #ddd;
+  }
+}
