@@ -1,9 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import '../styles/PasswordGenerator.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faClipboard } from '@fortawesome/free-solid-svg-icons';
 import generatePassword from '../utils/generatePassword';
+import copyToClipboard from '../utils/copyToClipboard';
 
 const PasswordGenerator = () => {
   const [password, setPassword] = useState('');
+  const passwordText = useRef();
   const [length, setLength] = useState(14);
 
   // check states
@@ -51,12 +55,22 @@ const PasswordGenerator = () => {
       onSubmit={onSubmit}
     >
       <h1>Password Generator</h1>
-      <input
-        id="password"
-        className={strengthClass}
-        value={password}
-        disabled
-      />
+      <div id="password-container">
+        <input
+          id="password"
+          className={strengthClass}
+          value={password}
+          ref={passwordText}
+          disabled
+        />
+        <FontAwesomeIcon
+          id="clipboard-icon"
+          icon={faClipboard}
+          size="lg"
+          title="Copy to Clipboard!"
+          onClick={() => copyToClipboard(password)}
+        />
+      </div>
       <span id="strength">Strength ({strengthClass})</span>
       <br />
       <label>Length ({length})</label>

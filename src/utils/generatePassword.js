@@ -30,7 +30,6 @@ const generatePassword = (length, conditions) => {
   while (idx < length || conditionsLeft.size > 0) {
     const randomCondition =
       conditionsArr[Math.floor(Math.random() * conditionsArr.length)];
-    debugger;
     password[idx % length] = CharGenerator[randomCondition]();
 
     idx++;
