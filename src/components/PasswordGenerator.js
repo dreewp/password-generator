@@ -1,33 +1,52 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useReducer } from 'react';
 import '../styles/PasswordGenerator.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faClipboard } from '@fortawesome/free-solid-svg-icons';
+import { faClipboard, faCheck } from '@fortawesome/free-solid-svg-icons';
 import generatePassword from '../utils/generatePassword';
 import copyToClipboard from '../utils/copyToClipboard';
 
+const initialCheckState = {
+  uppercase: true,
+  lowercase: true,
+  numbers: true,
+  symbols: true,
+};
+const checkStateReducer = (state, action) => {
+  return {
+    ...state,
+    [action.name]: action.checked,
+  };
+};
+
+const DEFAULT_LENGTH = 14;
+
 const PasswordGenerator = () => {
-  const [password, setPassword] = useState('');
-  const passwordText = useRef();
-  const [length, setLength] = useState(14);
+  const [length, setLength] = useState(DEFAULT_LENGTH);
+  const [password, setPassword] = useState(
+    generatePassword(DEFAULT_LENGTH, initialCheckState)
+  );
+  const [checkStates, dispatchCheckStates] = useReducer(
+    checkStateReducer,
+    initialCheckState
+  );
+  const handleCheck = (e) => {
+    const { name, checked } = e.target;
+    dispatchCheckStates({ name, checked });
+  };
 
-  // check states
-  const [uppercase, setUppercase] = useState(true);
-  const [lowercase, setLowercase] = useState(true);
-  const [numbers, setNumbers] = useState(true);
-  const [symbols, setSymbols] = useState(true);
-
-  useEffect(() => {
-    generateAndSetPassword(length);
-  }, []);
+  // when copying password to clipboard
+  const [copied, setCopied] = useState(false);
+  const onCopy = () => {
+    copyToClipboard(password);
+    setCopied(true);
+    setTimeout(() => {
+      setCopied(false);
+    }, 500);
+  };
 
   const generateAndSetPassword = async (length, idx = 20) => {
     if (idx < 0) return;
-    const password = generatePassword(length, {
-      uppercase,
-      lowercase,
-      numbers,
-      symbols,
-    });
+    const password = generatePassword(length, checkStates);
     await setTimeout(() => setPassword(password), 10);
     generateAndSetPassword(length, idx - 1);
   };
@@ -35,7 +54,7 @@ const PasswordGenerator = () => {
     e.preventDefault();
     generateAndSetPassword(length);
   };
-  const handleLengthChange = (e) => {
+  const onLengthChange = (e) => {
     const length = e.target.value;
     setLength(length);
     generateAndSetPassword(length);
@@ -60,16 +79,19 @@ const PasswordGenerator = () => {
           id="password"
           className={strengthClass}
           value={password}
-          ref={passwordText}
           disabled
         />
-        <FontAwesomeIcon
-          id="clipboard-icon"
-          icon={faClipboard}
-          size="lg"
-          title="Copy to Clipboard!"
-          onClick={() => copyToClipboard(password)}
-        />
+        {copied ? (
+          <FontAwesomeIcon id="check-icon" icon={faCheck} size="lg" />
+        ) : (
+          <FontAwesomeIcon
+            id="clipboard-icon"
+            icon={faClipboard}
+            size="lg"
+            title="Copy to Clipboard!"
+            onClick={onCopy}
+          />
+        )}
       </div>
       <span id="strength">Strength ({strengthClass})</span>
       <br />
@@ -80,37 +102,41 @@ const PasswordGenerator = () => {
         max={40}
         step={1}
         value={length}
-        onChange={handleLengthChange}
+        onChange={onLengthChange}
       />
       <label>
         <input
           type="checkbox"
-          checked={uppercase}
-          onChange={(e) => setUppercase(e.target.checked)}
+          name="uppercase"
+          checked={checkStates.uppercase}
+          onChange={handleCheck}
         />
         Include uppercase letters
       </label>
       <label>
         <input
           type="checkbox"
-          checked={lowercase}
-          onChange={(e) => setLowercase(e.target.checked)}
+          name="lowercase"
+          checked={checkStates.lowercase}
+          onChange={handleCheck}
         />
         Include lowercase letters
       </label>
       <label>
         <input
           type="checkbox"
-          checked={numbers}
-          onChange={(e) => setNumbers(e.target.checked)}
+          name="numbers"
+          checked={checkStates.numbers}
+          onChange={handleCheck}
         />
         Include numbers
       </label>
       <label>
         <input
           type="checkbox"
-          checked={symbols}
-          onChange={(e) => setSymbols(e.target.checked)}
+          name="symbols"
+          checked={checkStates.symbols}
+          onChange={handleCheck}
         />
         Include symbols (ex. !@#$)
       </label>
